@@ -12,17 +12,17 @@ window.Monetization = (function() {
     function initAds() {
         console.log("Ads initialization...");
         
-        // Exemplo de como inicializar o AdSense programaticamente caso precise dar reload
-        // const adSlots = document.querySelectorAll('.adsbygoogle');
-        // adSlots.forEach(slot => {
-        //     if (!slot.getAttribute('data-ad-status')) {
-        //         try {
-        //             (adsbygoogle = window.adsbygoogle || []).push({});
-        //         } catch (e) {
-        //             console.error("AdSense Error: ", e);
-        //         }
-        //     }
-        // });
+        // Inicializar o AdSense programaticamente para os slots da tela
+        const adSlots = document.querySelectorAll('.adsbygoogle');
+        adSlots.forEach(slot => {
+            if (!slot.getAttribute('data-ad-status')) {
+                try {
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                } catch (e) {
+                    console.error("AdSense Error: ", e);
+                }
+            }
+        });
     }
 
     // Inicializar quando o DOM estiver pronto
