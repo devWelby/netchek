@@ -39,22 +39,48 @@ app.use('/api/', apiLimiter);
 const frontendPath = path.join(__dirname, '..');
 app.use(express.static(frontendPath));
 
-// Garantir que existe um arquivo de teste de 100MB
-const testFilePath = path.join(__dirname, 'test-files', '100mb.dat');
-if (!fs.existsSync(testFilePath)) {
-    console.warn("⚠️ Arquivo de teste não encontrado. Crie usando o script generate-test-file.js");
-}
+const crypto = require('crypto');
 
-// Endpoint de Download
+// Endpoint de Download dinâmico na memória (Sem I/O de disco)
 app.get('/api/test/download', (req, res) => {
-    // Para um teste leve (se o arquivo não existir), envia buffer na memória
-    if (fs.existsSync(testFilePath)) {
-        res.download(testFilePath);
-    } else {
-        res.setHeader('Content-Type', 'application/octet-stream');
-        const buffer = Buffer.alloc(10 * 1024 * 1024); // 10MB fallback
-        res.send(buffer);
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
+    // Default 100MB, mas permite configuração por query string (ex: ?size=52428800)
+    const requestedSize = parseInt(req.query.size) || (100 * 1024 * 1024); 
+    const chunkSize = 1024 * 1024; // 1MB chunks para não sobrecarregar a RAM
+    
+    res.setHeader('Content-Length', requestedSize);
+
+    let bytesSent = 0;
+    // Pré-gera um chunk randomico para não gastar CPU durante o loop
+    const chunk = crypto.randomBytes(chunkSize);
+
+    function streamData() {
+        let canWrite = true;
+        while (canWrite && bytesSent < requestedSize) {
+            let writeSize = Math.min(chunkSize, requestedSize - bytesSent);
+            let writeChunk = writeSize === chunkSize ? chunk : chunk.subarray(0, writeSize);
+            canWrite = res.write(writeChunk);
+            bytesSent += writeSize;
+        }
+
+        if (bytesSent < requestedSize) {
+            // Aguarda o buffer do express esvaziar antes de escrever mais
+            res.once('drain', streamData);
+        } else {
+            res.end();
+        }
     }
+
+    req.on('close', () => {
+        // Interrompe se o cliente cancelar
+        bytesSent = requestedSize; 
+    });
+
+    streamData();
 });
 
 // Endpoint de Upload

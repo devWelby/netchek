@@ -22,18 +22,10 @@ window.NetworkTest = (function() {
     let updateInterval;
     let startTime;
     
-    // Configurações (Ajuste para o servidor de produção)
-    // Para teste local, assumindo backend na porta 3000
-    const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-        ? 'http://localhost:3000' 
-        : '';
-        
-    const WS_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'ws://localhost:3000/ws/ping'
-        : `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws/ping`;
-
-    const DOWNLOAD_URL = `${API_BASE}/api/test/download`;
-    const UPLOAD_URL = `${API_BASE}/api/test/upload`;
+    let API_BASE = '';
+    let WS_URL = '';
+    let DOWNLOAD_URL = '';
+    let UPLOAD_URL = '';
 
     // DOM Elements para Live Update
     const liveDownload = document.getElementById('liveDownload');
@@ -53,6 +45,23 @@ window.NetworkTest = (function() {
         downloadAborts = [];
         uploadAborts = [];
         startTime = Date.now();
+
+        const selectedServer = document.getElementById('serverSelect').value;
+        if (selectedServer) {
+            API_BASE = selectedServer;
+            const urlObj = new URL(selectedServer);
+            WS_URL = `${urlObj.protocol === 'https:' ? 'wss' : 'ws'}://${urlObj.host}/ws/ping`;
+        } else {
+            API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+                ? 'http://localhost:3000' 
+                : '';
+            WS_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                ? 'ws://localhost:3000/ws/ping'
+                : `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws/ping`;
+        }
+        
+        DOWNLOAD_URL = `${API_BASE}/api/test/download`;
+        UPLOAD_URL = `${API_BASE}/api/test/upload`;
 
         window.UI.updateStatus('Conectando WebSocket para medição de latência...');
         await initWebSocket();
@@ -248,6 +257,20 @@ window.NetworkTest = (function() {
         if (window.NetChart) {
             window.NetChart.update(dataPoint);
         }
+        
+        // Update Gauges Se existirem
+        updateGauge('downloadGaugePath', dataPoint.download, 1000); // Max 1000 Mbps
+        updateGauge('uploadGaugePath', dataPoint.upload, 500); // Max 500 Mbps
+    }
+
+    function updateGauge(elementId, value, maxVal) {
+        const path = document.getElementById(elementId);
+        if(!path) return;
+        let percent = Math.min(value / maxVal, 1);
+        // gauge-fill dasharray is 125.6
+        // offset is 125.6 * (1 - percent)
+        const offset = 125.6 * (1 - percent);
+        path.style.strokeDashoffset = offset;
     }
 
     function calculateFinalResults() {

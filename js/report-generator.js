@@ -25,6 +25,8 @@ window.ReportGenerator = (function() {
     
     const exportPdfBtn = document.getElementById('exportPdfBtn');
     const copyReportBtn = document.getElementById('copyReportBtn');
+    const shareWhatsappBtn = document.getElementById('shareWhatsappBtn');
+    const shareTwitterBtn = document.getElementById('shareTwitterBtn');
 
     let lastResults = null;
 
@@ -216,6 +218,25 @@ window.ReportGenerator = (function() {
             setTimeout(() => copyReportBtn.innerText = original, 2000);
         });
     });
+
+    // Compartilhar no WhatsApp
+    if (shareWhatsappBtn) {
+        shareWhatsappBtn.addEventListener('click', () => {
+            if (!lastResults) return;
+            const text = `⚡ Fiz um teste no NetChek e minha nota foi ${overallGrade.innerText}!\n\n📶 Ping: ${lastResults.ping.avg.toFixed(1)}ms\n⬇️ Download: ${lastResults.download.avg.toFixed(1)} Mbps\n⬆️ Upload: ${lastResults.upload.avg.toFixed(1)} Mbps\n🔴 Bufferbloat: ${lastResults.bufferbloat}\n\nFaça seu teste também: https://netchek.onrender.com`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        });
+    }
+
+    // Compartilhar no Twitter (X)
+    if (shareTwitterBtn) {
+        shareTwitterBtn.addEventListener('click', () => {
+            if (!lastResults) return;
+            const text = `⚡ Minha conexão para jogos tirou nota ${overallGrade.innerText} no NetChek!\n\nPing: ${lastResults.ping.avg.toFixed(1)}ms | Bufferbloat: ${lastResults.bufferbloat}\n\nDescubra se a sua rede está pronta para o competitivo:`;
+            const url = "https://netchek.onrender.com";
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+        });
+    }
 
     return {
         generate

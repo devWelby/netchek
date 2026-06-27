@@ -4,8 +4,7 @@
   "description": "Backend for NetChek Diagnostics",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "generate-file": "node test-files/generate-test-file.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

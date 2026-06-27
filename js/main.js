@@ -97,6 +97,8 @@ async function finishTest() {
         window.ReportGenerator.generate(testResults);
     }
     
+    saveTestToHistory(testResults);
+    
     // Scroll para resultados
     resultsSection.scrollIntoView({ behavior: 'smooth' });
 }
@@ -105,3 +107,62 @@ async function finishTest() {
 window.UI = {
     updateStatus
 };
+
+// --- Histórico de Testes ---
+const historyGrid = document.getElementById('historyGrid');
+const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+function loadHistory() {
+    if (!historyGrid) return;
+    const history = JSON.parse(localStorage.getItem('netchek_history') || '[]');
+    historyGrid.innerHTML = '';
+    
+    if (history.length === 0) {
+        historyGrid.innerHTML = '<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center;">Nenhum teste anterior encontrado.</p>';
+        if(clearHistoryBtn) clearHistoryBtn.style.display = 'none';
+        return;
+    }
+    
+    if(clearHistoryBtn) clearHistoryBtn.style.display = 'block';
+
+    history.forEach(item => {
+        const date = new Date(item.date).toLocaleString('pt-BR');
+        const card = document.createElement('div');
+        card.className = 'history-card';
+        card.innerHTML = `
+            <h4>${date}</h4>
+            <p>Ping: <strong>${item.ping.avg.toFixed(1)}ms</strong></p>
+            <p>Download: <strong>${item.download.avg.toFixed(1)} Mbps</strong></p>
+            <p>Upload: <strong>${item.upload.avg.toFixed(1)} Mbps</strong></p>
+            <p>Bufferbloat: <span class="grade">${item.bufferbloat}</span></p>
+        `;
+        historyGrid.appendChild(card);
+    });
+}
+
+function saveTestToHistory(results) {
+    let history = JSON.parse(localStorage.getItem('netchek_history') || '[]');
+    // Adiciona no topo
+    history.unshift({
+        date: new Date().toISOString(),
+        ping: results.ping,
+        download: results.download,
+        upload: results.upload,
+        bufferbloat: results.bufferbloat
+    });
+    // Manter apenas os últimos 5
+    if (history.length > 5) history.pop();
+    
+    localStorage.setItem('netchek_history', JSON.stringify(history));
+    loadHistory();
+}
+
+if(clearHistoryBtn) {
+    clearHistoryBtn.addEventListener('click', () => {
+        localStorage.removeItem('netchek_history');
+        loadHistory();
+    });
+}
+
+// Inicializar histórico
+loadHistory();

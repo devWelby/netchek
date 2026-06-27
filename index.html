@@ -42,6 +42,14 @@
         <section class="test-section">
             <div class="test-controls">
                 <div class="test-config">
+                    <label for="serverSelect">Servidor de Teste:</label>
+                    <select id="serverSelect">
+                        <option value="" selected>Padrão (Este Servidor)</option>
+                        <!-- Adicione mais servidores aqui no futuro -->
+                        <option value="https://exemplo-sp.onrender.com">São Paulo, BR (Exemplo)</option>
+                    </select>
+                </div>
+                <div class="test-config">
                     <label for="testDuration">Duração do Teste (s):</label>
                     <select id="testDuration">
                         <option value="30">30 Segundos (Rápido)</option>
@@ -69,13 +77,25 @@
 
             <div class="live-dashboard hidden" id="liveDashboard">
                 <div class="live-metrics">
-                    <div class="metric-card live-metric">
+                    <div class="metric-card live-metric gauge-card">
                         <span class="metric-label">Download</span>
-                        <span class="metric-value" id="liveDownload">-- <small>Mbps</small></span>
+                        <div class="gauge-container">
+                            <svg class="gauge-svg" viewBox="0 0 100 50">
+                                <path class="gauge-bg" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" />
+                                <path id="downloadGaugePath" class="gauge-fill" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" />
+                            </svg>
+                            <span class="metric-value gauge-value" id="liveDownload">-- <small>Mbps</small></span>
+                        </div>
                     </div>
-                    <div class="metric-card live-metric">
+                    <div class="metric-card live-metric gauge-card">
                         <span class="metric-label">Upload</span>
-                        <span class="metric-value" id="liveUpload">-- <small>Mbps</small></span>
+                        <div class="gauge-container">
+                            <svg class="gauge-svg" viewBox="0 0 100 50">
+                                <path class="gauge-bg" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" />
+                                <path id="uploadGaugePath" class="gauge-fill" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" />
+                            </svg>
+                            <span class="metric-value gauge-value" id="liveUpload">-- <small>Mbps</small></span>
+                        </div>
                     </div>
                     <div class="metric-card live-metric">
                         <span class="metric-label">Ping Atual</span>
@@ -98,6 +118,8 @@
             <div class="results-header">
                 <h2>Relatório de Desempenho</h2>
                 <div class="results-actions">
+                    <button id="shareWhatsappBtn" class="btn-icon-brand" aria-label="Compartilhar no WhatsApp">📱</button>
+                    <button id="shareTwitterBtn" class="btn-icon-brand" aria-label="Compartilhar no X (Twitter)">🐦</button>
                     <button id="exportPdfBtn" class="btn-secondary">📄 Baixar PDF</button>
                     <button id="copyReportBtn" class="btn-secondary">📋 Copiar Texto</button>
                 </div>
@@ -186,6 +208,15 @@
                     </div>
                 </div>
             </div>
+        </section>
+
+        <!-- Seção Histórico -->
+        <section class="history-section container" id="historySection">
+            <h2>Histórico de Testes</h2>
+            <div class="history-grid" id="historyGrid">
+                <!-- Cards injetados via JS -->
+            </div>
+            <button id="clearHistoryBtn" class="btn-secondary" style="margin-top:15px; display:none;">Limpar Histórico</button>
         </section>
     </main>
 
