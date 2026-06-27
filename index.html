@@ -6,6 +6,7 @@
     <title>NetChek Diagnostics - Teste de Conexão Profundo para Gamers</title>
     <meta name="description" content="Teste de rede avançado para gamers. Meça Ping, Jitter, Packet Loss, Bufferbloat, Download e Upload em tempo real.">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/seo.css">
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -218,6 +219,103 @@
             </div>
             <button id="clearHistoryBtn" class="btn-secondary" style="margin-top:15px; display:none;">Limpar Histórico</button>
         </section>
+
+        <!-- Seção de Artigos e SEO -->
+        <article class="seo-content container" id="seoContent">
+            <h2>Por que Gamers Precisam de um Teste de Conexão Profundo?</h2>
+            <p>Se você já morreu atrás da parede no CS2, ou teve aquele "teleporte" no meio de uma fight no Valorant, você sabe que velocidade não é tudo. Os testes de velocidade comuns medem a largura de banda (quantos Megas você tem), mas ignoram a qualidade e a estabilidade da rota que os dados fazem até o servidor do jogo.</p>
+            <p>O <strong>NetChek Diagnostics</strong> foi criado para ir além. Ele envia requisições dinâmicas e mede não só se os pacotes chegam, mas como eles se comportam sob estresse, revelando os verdadeiros vilões do lag.</p>
+
+            <h2>O Que o NetChek Mede?</h2>
+            <div class="info-boxes">
+                <div class="info-box danger-box">
+                    <h3>Perda de Pacotes (Packet Loss)</h3>
+                    <p>O principal inimigo da estabilidade. Perder até 1% de pacotes já causa tiros que não registram e travamentos de vídeo. Acima de 5%, jogar partidas ranqueadas se torna quase impossível. Se houver perda, a culpa normalmente é de cabos danificados ou roteamento ruim do provedor.</p>
+                </div>
+                <div class="info-box success-box">
+                    <h3>Latência (Ping)</h3>
+                    <p>O tempo de resposta da rede. Para navegação, 100ms é aceitável, mas para jogos competitivos (CS2, LoL, Valorant), o ideal é manter o ping <strong>abaixo de 40ms</strong> para não ter desvantagem nas trocas de tiro (peeker's advantage).</p>
+                </div>
+                <div class="info-box warning-box">
+                    <h3>Jitter e Bufferbloat</h3>
+                    <p>O <strong>Jitter</strong> é a oscilação do ping. Se seu ping vai de 20ms para 150ms do nada, isso é Jitter alto. O <strong>Bufferbloat</strong> ocorre quando sua internet funciona bem, mas engasga violentamente quando alguém na casa começa a assistir Netflix ou baixar um arquivo.</p>
+                </div>
+            </div>
+
+            <h2>Como Interpretar os Resultados?</h2>
+            <div class="table-responsive">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Classificação</th>
+                            <th>Perda de Pacotes</th>
+                            <th>Ping</th>
+                            <th>Jitter</th>
+                            <th>Recomendação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="grade-badge grade-a">Excelente</span></td>
+                            <td>0%</td>
+                            <td>Até 30ms</td>
+                            <td>Até 5ms</td>
+                            <td>Perfeito para CS2/Valorant no modo competitivo.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="grade-badge grade-b">Boa</span></td>
+                            <td>Até 0.5%</td>
+                            <td>Até 60ms</td>
+                            <td>Até 10ms</td>
+                            <td>Bom para jogos normais e streaming de vídeo (Twitch).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="grade-badge grade-c">Regular</span></td>
+                            <td>0.5% a 2%</td>
+                            <td>Até 100ms</td>
+                            <td>Até 20ms</td>
+                            <td>Dificuldades em jogos FPS. Possível lag esporádico.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="grade-badge grade-f">Problemática</span></td>
+                            <td>Acima de 2%</td>
+                            <td>Instável</td>
+                            <td>Alto</td>
+                            <td>Impossível jogar seriamente. Ligue para o provedor.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Recomendações Práticas de Otimização</h2>
+            <ul class="tips-list">
+                <li><strong>Abandone o Wi-Fi:</strong> Redes sem fio são instáveis por natureza devido a interferências. Sempre jogue com um <strong>Cabo de Rede (Ethernet)</strong> conectado direto no roteador.</li>
+                <li><strong>Ajuste seu Roteador (QoS):</strong> Se você sofre de Bufferbloat (lag quando outros usam a rede), ative a função QoS (Quality of Service) no seu roteador para priorizar o tráfego do seu PC/Console.</li>
+                <li><strong>Teste em Horários Diferentes:</strong> A rede do seu bairro pode estar congestionada à noite (horário de pico). Teste em diferentes horários para descobrir gargalos na infraestrutura do seu provedor de internet (ISP).</li>
+            </ul>
+
+            <h2>Perguntas Frequentes (FAQ)</h2>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <button class="faq-question">Por que meu ping é bom nos testes normais, mas laga no jogo?</button>
+                    <div class="faq-answer">
+                        <p>Testes normais medem a média ou conectam ao servidor mais próximo fisicamente. No jogo real, o servidor pode estar em outro estado, e o tráfego é contínuo. Além disso, testes comuns não detectam o <strong>Bufferbloat</strong>, que é quando sua rede perde desempenho sob estresse simultâneo.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Qual porcentagem de Perda de Pacotes é aceitável?</button>
+                    <div class="faq-answer">
+                        <p>Para navegação web, pequenos valores são imperceptíveis porque o protocolo TCP reenvia os dados. Porém, jogos utilizam UDP, onde dados não são reenviados. O ideal absoluto é <strong>0%</strong>. Acima de 1%, você já sentirá seus comandos falhando.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">O que devo dizer ao meu provedor se os testes derem ruim?</button>
+                    <div class="faq-answer">
+                        <p>Utilize o botão "Copiar Texto" nos resultados do NetChek. Envie para o suporte técnico do seu provedor informando exatamente a métrica problemática ("Estou tendo 5% de Perda de Pacotes para servidores de São Paulo"). Testes cabeados servem como prova contra rotas mal configuradas.</p>
+                    </div>
+                </div>
+            </div>
+        </article>
     </main>
 
     <footer class="footer">

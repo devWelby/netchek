@@ -26,6 +26,9 @@ app.use((req, res, next) => {
     next();
 });
 
+// Confiar no proxy do Render para o Rate Limit funcionar com IPs reais
+app.set('trust proxy', 1);
+
 // Rate Limiting para Upload/Download (evitar abuso)
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos

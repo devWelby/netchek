@@ -1,0 +1,189 @@
+/* Estilos para a seção SEO e Artigos */
+.seo-content {
+    margin-top: 40px;
+    padding: 30px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.seo-content h2 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-top: 40px;
+}
+
+.seo-content h2:first-child {
+    margin-top: 0;
+}
+
+.seo-content p {
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 15px;
+    font-size: 1.05rem;
+}
+
+.seo-content strong {
+    color: var(--text-main);
+}
+
+/* Info Boxes */
+.info-boxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.info-box {
+    padding: 20px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    border-left: 5px solid;
+}
+
+.info-box h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.info-box.danger-box {
+    border-color: var(--danger);
+}
+.info-box.danger-box h3 { color: var(--danger); }
+
+.info-box.success-box {
+    border-color: var(--success);
+}
+.info-box.success-box h3 { color: var(--success); }
+
+.info-box.warning-box {
+    border-color: var(--warning);
+}
+.info-box.warning-box h3 { color: var(--warning); }
+
+/* Table */
+.table-responsive {
+    overflow-x: auto;
+    margin: 30px 0;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.comparison-table th, .comparison-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.comparison-table th {
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.comparison-table tr:last-child td {
+    border-bottom: none;
+}
+
+.grade-badge {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.grade-a { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+.grade-b { background: rgba(0, 210, 255, 0.2); color: #00d2ff; }
+.grade-c { background: rgba(241, 196, 15, 0.2); color: #f1c40f; }
+.grade-f { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+
+/* Tips List */
+.tips-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.tips-list li {
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 15px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.tips-list li::before {
+    content: "⚡";
+    position: absolute;
+    left: 0;
+    top: 2px;
+    color: var(--primary-color);
+}
+
+/* FAQ Accordion */
+.faq-container {
+    margin-top: 30px;
+}
+
+.faq-item {
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.faq-question {
+    width: 100%;
+    text-align: left;
+    padding: 18px 20px;
+    background: var(--bg-main);
+    color: var(--text-main);
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.3s;
+}
+
+.faq-question:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.faq-question::after {
+    content: "+";
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    transition: transform 0.3s;
+}
+
+.faq-item.active .faq-question::after {
+    transform: rotate(45deg);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease;
+    background: var(--bg-card);
+}
+
+.faq-item.active .faq-answer {
+    padding: 20px;
+    max-height: 500px;
+}
