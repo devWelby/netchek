@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetChek Diagnostics - Teste de Conexão Profundo para Gamers</title>
+    <meta name="description" content="Teste de rede avançado para gamers. Meça Ping, Jitter, Packet Loss, Bufferbloat, Download e Upload em tempo real.">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0a0c">
+    
+    <!-- Fontes: Fira Code para dados, Inter para texto geral -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Bibliotecas Externas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+
+    <!-- AdSense Placeholder Script -->
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+</head>
+<body class="theme-dark">
+    <header class="header">
+        <div class="header-content container">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <h1>NetChek<span class="highlight">Diagnostics</span></h1>
+            </div>
+            <button id="themeToggle" class="btn-icon" aria-label="Alternar Tema">
+                <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Seção Principal de Teste -->
+        <section class="test-section">
+            <div class="test-controls">
+                <div class="test-config">
+                    <label for="testDuration">Duração do Teste (s):</label>
+                    <select id="testDuration">
+                        <option value="30">30 Segundos (Rápido)</option>
+                        <option value="60" selected>60 Segundos (Recomendado)</option>
+                        <option value="120">120 Segundos (Profundo)</option>
+                    </select>
+                </div>
+                <button id="startBtn" class="btn-primary">INICIAR TESTE COMPLETO</button>
+            </div>
+
+            <div id="progressContainer" class="progress-container hidden">
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <p id="statusText" class="status-text">Preparando servidores...</p>
+                <p id="timeRemaining" class="time-remaining">Tempo restante: --s</p>
+            </div>
+
+            <!-- Ad Slot 1: Horizontal (Durante e pós teste) -->
+            <div class="ad-slot ad-horizontal" id="adSlot1">
+                <span class="ad-label">Publicidade</span>
+                <div class="ad-placeholder-content">Anúncio Horizontal (728x90)</div>
+                <!-- <ins class="adsbygoogle" style="display:inline-block;width:728px;height:90px" data-ad-client="ca-pub-XXX" data-ad-slot="XXX"></ins> -->
+            </div>
+
+            <div class="live-dashboard hidden" id="liveDashboard">
+                <div class="live-metrics">
+                    <div class="metric-card live-metric">
+                        <span class="metric-label">Download</span>
+                        <span class="metric-value" id="liveDownload">-- <small>Mbps</small></span>
+                    </div>
+                    <div class="metric-card live-metric">
+                        <span class="metric-label">Upload</span>
+                        <span class="metric-value" id="liveUpload">-- <small>Mbps</small></span>
+                    </div>
+                    <div class="metric-card live-metric">
+                        <span class="metric-label">Ping Atual</span>
+                        <span class="metric-value" id="livePing">-- <small>ms</small></span>
+                    </div>
+                    <div class="metric-card live-metric">
+                        <span class="metric-label">Perda de Pacotes</span>
+                        <span class="metric-value" id="livePacketLoss">0.0 <small>%</small></span>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="liveChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Resultados (Visível apenas ao final) -->
+        <section id="resultsSection" class="results-section hidden">
+            <div class="results-header">
+                <h2>Relatório de Desempenho</h2>
+                <div class="results-actions">
+                    <button id="exportPdfBtn" class="btn-secondary">📄 Baixar PDF</button>
+                    <button id="copyReportBtn" class="btn-secondary">📋 Copiar Texto</button>
+                </div>
+            </div>
+
+            <div class="grade-container">
+                <div class="grade-circle" id="overallGrade">
+                    <span>?</span>
+                </div>
+                <div class="grade-text">
+                    <h3>Nota da Conexão</h3>
+                    <p id="gradeDescription">Avaliando latência, estabilidade e capacidade para jogos.</p>
+                </div>
+            </div>
+
+            <!-- Cards de Resultados Finais -->
+            <div class="results-grid" id="pdfReportContent">
+                <div class="metric-card">
+                    <h4>Download</h4>
+                    <div class="metric-split">
+                        <div>
+                            <span>Médio</span>
+                            <strong id="resDownloadAvg">--</strong> Mbps
+                        </div>
+                        <div>
+                            <span>Máx</span>
+                            <strong id="resDownloadMax">--</strong> Mbps
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <h4>Upload</h4>
+                    <div class="metric-split">
+                        <div>
+                            <span>Médio</span>
+                            <strong id="resUploadAvg">--</strong> Mbps
+                        </div>
+                        <div>
+                            <span>Máx</span>
+                            <strong id="resUploadMax">--</strong> Mbps
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card highlight-card">
+                    <h4>Latência (Ping)</h4>
+                    <ul class="metric-list">
+                        <li><span>Mín:</span> <strong id="resPingMin">--</strong> ms</li>
+                        <li><span>Média:</span> <strong id="resPingAvg">--</strong> ms</li>
+                        <li><span>Máx:</span> <strong id="resPingMax">--</strong> ms</li>
+                        <li><span>Desvio:</span> <strong id="resPingJitter">--</strong> ms</li>
+                    </ul>
+                </div>
+                <div class="metric-card warning-card">
+                    <h4>Estabilidade</h4>
+                    <ul class="metric-list">
+                        <li><span>Jitter Médio:</span> <strong id="resJitterAvg">--</strong> ms</li>
+                        <li><span>Packet Loss:</span> <strong id="resPacketLoss">--</strong> %</li>
+                        <li><span>Bufferbloat:</span> <strong id="resBufferbloat">--</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="results-layout">
+                <div class="results-main">
+                    <!-- Diagnóstico Textual -->
+                    <div class="diagnostic-box">
+                        <h3>Diagnóstico Automático</h3>
+                        <ul id="diagnosticText" class="diagnostic-list">
+                            <!-- Injetado via JS -->
+                        </ul>
+                    </div>
+
+                    <!-- Recomendações -->
+                    <div class="recommendations-box">
+                        <h3>Recomendações Acionáveis</h3>
+                        <ul id="recommendationsList" class="recommendations-list">
+                            <!-- Injetado via JS -->
+                        </ul>
+                    </div>
+                </div>
+                <div class="results-sidebar">
+                    <!-- Ad Slot 2: Quadrado (Pós teste) -->
+                    <div class="ad-slot ad-square" id="adSlot2">
+                        <span class="ad-label">Publicidade</span>
+                        <div class="ad-placeholder-content">Anúncio Quadrado (300x250)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 NetChek Diagnostics. Teste de rede projetado para performance extrema em jogos.</p>
+            <div class="footer-links">
+                <a href="#">Sobre</a>
+                <a href="#">Como Interpretar</a>
+                <a href="#">Privacidade</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts da Aplicação -->
+    <script src="js/monetization.js"></script>
+    <script src="js/chart-manager.js"></script>
+    <script src="js/network-test.js"></script>
+    <script src="js/report-generator.js"></script>
+    <script src="js/main.js"></script>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js').catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

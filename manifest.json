@@ -1,0 +1,21 @@
+{
+  "name": "NetChek Diagnostics",
+  "short_name": "NetChek",
+  "description": "Teste profundo de rede, ping, jitter e packet loss focado em gamers (CS2, Valorant).",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0c",
+  "theme_color": "#0a0a0c",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192/0a0a0c/00d2ff?text=⚡",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512/0a0a0c/00d2ff?text=⚡",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

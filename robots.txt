@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+# Evitar indexar arquivos de teste pesados caso o servidor estático exponha
+Disallow: /server/
+Disallow: /api/
