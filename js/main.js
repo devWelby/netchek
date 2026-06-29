@@ -55,9 +55,11 @@ startBtn.addEventListener('click', async () => {
     
     isTestRunning = true;
     
-    // Loop de tempo
+    // Loop de tempo usando timestamp delta para evitar throttle do Chrome
+    const endTime = Date.now() + (totalTime * 1000);
     testInterval = setInterval(() => {
-        remainingTime--;
+        remainingTime = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+        
         const progressPercent = ((totalTime - remainingTime) / totalTime) * 100;
         progressFill.style.width = `${progressPercent}%`;
         timeRemaining.innerText = `Tempo restante: ${remainingTime}s`;

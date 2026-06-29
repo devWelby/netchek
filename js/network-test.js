@@ -22,6 +22,11 @@ window.NetworkTest = (function() {
     let updateInterval;
     let startTime;
     
+    // Pré-computar payload GLOBALMENTE para evitar Garbage Collection stress
+    const CACHED_UPLOAD_PAYLOAD = new Uint8Array(2 * 1024 * 1024);
+    window.crypto.getRandomValues(CACHED_UPLOAD_PAYLOAD);
+
+    
     let API_BASE = '';
     let WS_URL = '';
     let DOWNLOAD_URL = '';
@@ -180,12 +185,12 @@ window.NetworkTest = (function() {
                 }
             }
         } catch (err) {
-            // Se abortado ou erro de rede, apenas tenta de novo se rodando
+            // Se abortado ou erro de rede, espera um momento maior para não engasgar o navegador com retry infinito
         }
         
         // Loop infinito enquanto durar o teste
         if (isRunning) {
-            setTimeout(downloadWorker, 100);
+            setTimeout(downloadWorker, 200); // 200ms de respiro entre downloads para reduzir pressão no Event Loop
         }
     }
 
@@ -202,30 +207,27 @@ window.NetworkTest = (function() {
         const controller = new AbortController();
         uploadAborts.push(controller);
         
-        // Gerar payload aleatório (~2MB)
-        const payloadSize = 2 * 1024 * 1024;
-        const payload = new Uint8Array(payloadSize);
-        for(let i=0; i<payloadSize; i++) payload[i] = Math.floor(Math.random() * 256);
-        
         try {
             const startReqTime = Date.now();
             await fetch(`${UPLOAD_URL}?t=${Date.now()}`, {
                 method: 'POST',
-                body: payload,
+                body: CACHED_UPLOAD_PAYLOAD,
                 signal: controller.signal
             });
             
             const timeElapsed = (Date.now() - startReqTime) / 1000;
             if (timeElapsed > 0) {
-                const bitsSent = payloadSize * 8;
+                const bitsSent = (2 * 1024 * 1024) * 8; // Tamanho fixo do payload
                 const threadSpeed = (bitsSent / timeElapsed) / 1000000;
                 uploadSpeed = uploadSpeed * 0.8 + threadSpeed * 0.2;
             }
             
-        } catch(err) {}
+        } catch(err) {
+            // Silencia erro mas impede retry instantâneo agressivo
+        }
         
         if (isRunning) {
-            setTimeout(uploadWorker, 100);
+            setTimeout(uploadWorker, 200); // 200ms de respiro
         }
     }
 

@@ -23,6 +23,13 @@ app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    
+    // Strict-Transport-Security (HSTS) para forçar conexões seguras
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    
+    // Content-Security-Policy básica (Impede injeção de scripts externos desconhecidos)
+    res.setHeader('Content-Security-Policy', "default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://pagead2.googlesyndication.com; img-src 'self' data: https://pagead2.googlesyndication.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://pagead2.googlesyndication.com https://partner.googleadservices.com; frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com;");
+    
     next();
 });
 
@@ -51,8 +58,12 @@ app.get('/api/test/download', (req, res) => {
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
 
-    // Default 100MB, mas permite configuração por query string (ex: ?size=52428800)
-    const requestedSize = parseInt(req.query.size) || (100 * 1024 * 1024); 
+    // Validação estrita do tamanho do arquivo gerado para evitar Memory/CPU DoS via query parameters
+    const MAX_SIZE = 500 * 1024 * 1024; // Máximo de 500MB
+    const MIN_SIZE = 1024; // Mínimo de 1KB
+    const rawSize = parseInt(req.query.size, 10);
+    const requestedSize = (rawSize >= MIN_SIZE && rawSize <= MAX_SIZE) ? rawSize : (100 * 1024 * 1024);
+ 
     const chunkSize = 1024 * 1024; // 1MB chunks para não sobrecarregar a RAM
     
     res.setHeader('Content-Length', requestedSize);
@@ -102,9 +113,28 @@ app.post('/api/test/upload', (req, res) => {
     });
 });
 
-// WebSocket para medição de Ping/Latência
-wss.on('connection', (ws) => {
+// WebSocket para medição de Ping/Latência com validação básica de Origin
+wss.on('connection', (ws, req) => {
+    
+    // Validação rudimentar de Origin para impedir bots genéricos em páginas de terceiros
+    const origin = req.headers.origin;
+    if (origin && !origin.includes('localhost') && !origin.includes('netchek.onrender.com')) {
+        // Encerra a conexão se a origin for suspeita
+        ws.close(1008, "Origin not allowed");
+        return;
+    }
+
+    // Rate Limiting Básico em Memória por WS connection
+    let pingCount = 0;
+    const rateLimitInterval = setInterval(() => { pingCount = 0; }, 1000);
+
     ws.on('message', (message) => {
+        pingCount++;
+        // Limita a 20 pings por segundo por cliente
+        if (pingCount > 20) {
+            return; // Ignora pacotes de flood silenciosamente
+        }
+
         try {
             const data = JSON.parse(message);
             if (data.type === 'ping') {
@@ -114,6 +144,10 @@ wss.on('connection', (ws) => {
         } catch (e) {
             console.error('Invalid WS message', e);
         }
+    });
+
+    ws.on('close', () => {
+        clearInterval(rateLimitInterval);
     });
 });
 
