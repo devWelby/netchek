@@ -28,7 +28,7 @@ app.use((req, res, next) => {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     
     // Content-Security-Policy básica (Impede injeção de scripts externos desconhecidos)
-    res.setHeader('Content-Security-Policy', "default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://pagead2.googlesyndication.com; img-src 'self' data: https://pagead2.googlesyndication.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://pagead2.googlesyndication.com https://partner.googleadservices.com; frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com;");
+    res.setHeader('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://pagead2.googlesyndication.com https://via.placeholder.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://pagead2.googlesyndication.com https://partner.googleadservices.com; frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com; connect-src 'self' https://via.placeholder.com wss://netchek.onrender.com ws://localhost:3000 wss://localhost:3000 https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://pagead2.googlesyndication.com;");
     
     next();
 });

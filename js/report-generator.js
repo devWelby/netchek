@@ -27,11 +27,15 @@ window.ReportGenerator = (function() {
     const copyReportBtn = document.getElementById('copyReportBtn');
     const shareWhatsappBtn = document.getElementById('shareWhatsappBtn');
     const shareTwitterBtn = document.getElementById('shareTwitterBtn');
+    const profileSelect = document.getElementById('profileSelect');
+    const gradeDescription = document.getElementById('gradeDescription');
+    const readinessText = document.getElementById('readinessText');
 
     let lastResults = null;
 
     function generate(results) {
         lastResults = results;
+        const profile = profileSelect ? profileSelect.value : 'competitivo';
         
         // Popular UI de Métricas
         resDownloadAvg.innerText = results.download.avg.toFixed(1);
@@ -54,18 +58,36 @@ window.ReportGenerator = (function() {
             results.bufferbloat === 'Moderado' ? 'var(--warning)' : 'var(--success)';
             
         // Gerar Grade
-        const grade = calculateGrade(results);
+        const score = window.NetCheckScoring ? window.NetCheckScoring.calculateGameplayScore(results, profile) : 0;
+        const grade = calculateGrade(results, score);
         overallGrade.innerHTML = `<span>${grade}</span>`;
         overallGrade.style.borderColor = getGradeColor(grade);
         overallGrade.style.color = getGradeColor(grade);
         overallGrade.style.boxShadow = `0 0 20px ${getGradeColor(grade)}40`;
 
+        if (gradeDescription) {
+            gradeDescription.innerText = `Avaliação focada em ${window.NetCheckScoring ? window.NetCheckScoring.getProfileLabel(profile) : 'jogos'} e estabilidade de rede.`;
+        }
+
+        if (readinessText) {
+            readinessText.innerText = `${window.NetCheckScoring ? window.NetCheckScoring.getReadinessLabel(score) : 'Prontidão em análise'} • Score ${score}/100`;
+        }
+
         // Gerar Diagnóstico Textual e Recomendações
         generateTextualAnalysis(results, grade);
+        
+        // Renderizar Game Radar
+        if (results.gameRadar) {
+            renderGameRadar(results.gameRadar);
+        }
     }
 
-    function calculateGrade(r) {
-        let score = 100;
+    function calculateGrade(r, scoreOverride) {
+        let score = scoreOverride ?? 100;
+        
+        if (typeof scoreOverride === 'number') {
+            return score >= 95 ? 'A+' : score >= 85 ? 'A' : score >= 70 ? 'B' : score >= 50 ? 'C' : score >= 30 ? 'D' : 'F';
+        }
         
         // Penalidade Latência
         if (r.ping.avg > 100) score -= 30;
@@ -89,6 +111,42 @@ window.ReportGenerator = (function() {
         if (score >= 50) return 'C';
         if (score >= 30) return 'D';
         return 'F';
+    }
+
+    function renderGameRadar(radarData) {
+        const grid = document.getElementById('gameRadarGrid');
+        if (!grid) return;
+        
+        grid.innerHTML = ''; // Limpar anterior
+        
+        radarData.servers.forEach(game => {
+            const ping = radarData.latencies[game.id] || 999;
+            
+            // Lógica de Status
+            let statusClass = 'status-bad';
+            let statusText = 'Rota Lagada';
+            
+            if (ping < 40) {
+                statusClass = 'status-good';
+                statusText = 'Competitivo 🟢';
+            } else if (ping < 80) {
+                statusClass = 'status-warn';
+                statusText = 'Aceitável 🟡';
+            } else {
+                statusClass = 'status-bad';
+                statusText = 'Desvantagem 🔴';
+            }
+            
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            card.innerHTML = `
+                <div class="game-icon">${game.icon}</div>
+                <div class="game-name">${game.name}</div>
+                <div class="game-ping">${ping === 999 ? '--' : ping}<small>ms</small></div>
+                <div class="status-badge ${statusClass}">${statusText}</div>
+            `;
+            grid.appendChild(card);
+        });
     }
 
     function getGradeColor(grade) {
@@ -208,8 +266,8 @@ window.ReportGenerator = (function() {
 - Ping: ${lastResults.ping.avg.toFixed(1)}ms (Jitter: ${lastResults.ping.jitter.toFixed(1)}ms)
 - Packet Loss: ${lastResults.packetLoss.toFixed(2)}%
 - Bufferbloat: ${lastResults.bufferbloat}
-- Download: ${lastResults.download.avg.toFixed(1)} Mbps
 - Upload: ${lastResults.upload.avg.toFixed(1)} Mbps
+${lastResults.gameRadar ? '\n**Ping nos Jogos:**\n' + lastResults.gameRadar.servers.map(g => `- ${g.name}: ${lastResults.gameRadar.latencies[g.id]}ms`).join('\n') : ''}
         `.trim();
         
         navigator.clipboard.writeText(text).then(() => {
@@ -223,7 +281,13 @@ window.ReportGenerator = (function() {
     if (shareWhatsappBtn) {
         shareWhatsappBtn.addEventListener('click', () => {
             if (!lastResults) return;
-            const text = `⚡ Fiz um teste no NetChek e minha nota foi ${overallGrade.innerText}!\n\n📶 Ping: ${lastResults.ping.avg.toFixed(1)}ms\n⬇️ Download: ${lastResults.download.avg.toFixed(1)} Mbps\n⬆️ Upload: ${lastResults.upload.avg.toFixed(1)} Mbps\n🔴 Bufferbloat: ${lastResults.bufferbloat}\n\nFaça seu teste também: https://netchek.onrender.com`;
+            
+            let gameStats = '';
+            if (lastResults.gameRadar) {
+                gameStats = '\n\n🎮 *Ping nos Jogos:*\n' + lastResults.gameRadar.servers.map(g => `${g.icon} ${g.name}: ${lastResults.gameRadar.latencies[g.id]}ms`).join('\n');
+            }
+            
+            const text = `⚡ Fiz um teste no NetChek e minha nota foi ${overallGrade.innerText}!\n\n📶 Ping: ${lastResults.ping.avg.toFixed(1)}ms\n⬇️ Download: ${lastResults.download.avg.toFixed(1)} Mbps\n⬆️ Upload: ${lastResults.upload.avg.toFixed(1)} Mbps\n🔴 Bufferbloat: ${lastResults.bufferbloat}${gameStats}\n\nFaça seu teste também: https://netchek.onrender.com`;
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
         });
     }

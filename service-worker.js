@@ -1,4 +1,4 @@
-const CACHE_NAME = 'netgamer-v1';
+const CACHE_NAME = 'netgamer-v2';
 const ASSETS = [
     '/',
     '/index.html',
@@ -8,7 +8,8 @@ const ASSETS = [
     '/js/chart-manager.js',
     '/js/report-generator.js',
     '/js/monetization.js',
-    '/manifest.json'
+    '/manifest.json',
+    '/icon.svg'
 ];
 
 self.addEventListener('install', event => {
@@ -26,6 +27,12 @@ self.addEventListener('fetch', event => {
     
     event.respondWith(
         caches.match(event.request)
-            .then(response => response || fetch(event.request))
+            .then(response => {
+                if (response) return response;
+                return fetch(event.request).catch(() => {
+                    // Ignora silenciosamente se uma requisição externa (como anúncios) falhar offline
+                    console.warn('Network request failed for:', event.request.url);
+                });
+            })
     );
 });

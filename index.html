@@ -58,6 +58,14 @@
                         <option value="120">120 Segundos (Profundo)</option>
                     </select>
                 </div>
+                <div class="test-config">
+                    <label for="profileSelect">Perfil:</label>
+                    <select id="profileSelect">
+                        <option value="competitivo" selected>Competitivo</option>
+                        <option value="streaming">Streaming</option>
+                        <option value="casual">Casual</option>
+                    </select>
+                </div>
                 <button id="startBtn" class="btn-primary">INICIAR TESTE COMPLETO</button>
             </div>
 
@@ -135,6 +143,7 @@
                 <div class="grade-text">
                     <h3>Nota da Conexão</h3>
                     <p id="gradeDescription">Avaliando latência, estabilidade e capacidade para jogos.</p>
+                    <p id="readinessText" class="readiness-text">Prontidão para jogos em análise...</p>
                 </div>
             </div>
 
@@ -182,6 +191,17 @@
                         <li><span>Packet Loss:</span> <strong id="resPacketLoss">--</strong> %</li>
                         <li><span>Bufferbloat:</span> <strong id="resBufferbloat">--</strong></li>
                     </ul>
+                </div>
+            </div>
+
+            <!-- Novo Módulo: Game Radar -->
+            <div class="game-radar-box">
+                <div class="radar-header">
+                    <h3>🎮 Game-Radar: Ping por Servidor (América do Sul)</h3>
+                    <p>Latência estimada para a infraestrutura real dos jogos.</p>
+                </div>
+                <div class="radar-grid" id="gameRadarGrid">
+                    <!-- Preenchido via JS -->
                 </div>
             </div>
 
@@ -338,6 +358,7 @@
     <script src="js/monetization.js"></script>
     <script src="js/chart-manager.js"></script>
     <script src="js/network-test.js"></script>
+    <script src="js/scoring.js"></script>
     <script src="js/report-generator.js"></script>
     <script src="js/main.js"></script>
     

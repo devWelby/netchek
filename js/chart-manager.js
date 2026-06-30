@@ -30,6 +30,14 @@ window.NetChart = (function() {
             chartInstance.destroy();
         }
 
+        const gradientDownload = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+        gradientDownload.addColorStop(0, colors.primary + '60');
+        gradientDownload.addColorStop(1, colors.primary + '00');
+
+        const gradientUpload = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+        gradientUpload.addColorStop(0, colors.secondary + '60');
+        gradientUpload.addColorStop(1, colors.secondary + '00');
+
         chartInstance = new Chart(ctx, {
             type: 'line',
             data: {
@@ -39,23 +47,25 @@ window.NetChart = (function() {
                         label: 'Download (Mbps)',
                         data: [],
                         borderColor: colors.primary,
-                        backgroundColor: colors.primary + '20',
+                        backgroundColor: gradientDownload,
                         fill: true,
                         yAxisID: 'yBandwidth',
                         tension: 0.4,
-                        borderWidth: 2,
-                        pointRadius: 0
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        pointHoverRadius: 6
                     },
                     {
                         label: 'Upload (Mbps)',
                         data: [],
                         borderColor: colors.secondary,
-                        backgroundColor: colors.secondary + '20',
+                        backgroundColor: gradientUpload,
                         fill: true,
                         yAxisID: 'yBandwidth',
                         tension: 0.4,
-                        borderWidth: 2,
-                        pointRadius: 0
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        pointHoverRadius: 6
                     },
                     {
                         label: 'Ping (ms)',
@@ -63,9 +73,10 @@ window.NetChart = (function() {
                         borderColor: colors.danger,
                         backgroundColor: 'transparent',
                         yAxisID: 'yPing',
-                        tension: 0.2,
+                        tension: 0.4,
                         borderWidth: 2,
-                        pointRadius: 2
+                        pointRadius: 0,
+                        pointHoverRadius: 5
                     }
                 ]
             },
@@ -77,7 +88,8 @@ window.NetChart = (function() {
                     intersect: false,
                 },
                 animation: {
-                    duration: 0 // Animação zero para update fluido
+                    duration: 400,
+                    easing: 'easeOutQuart'
                 },
                 scales: {
                     x: {
